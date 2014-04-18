@@ -4,6 +4,7 @@
 #define DEFAULT_PORT "27015"
 #define SEND_BINARY
 
+#include "top.h" // typedef struct Control;
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -25,6 +26,8 @@
 #include <exception>
 //#include "DsauServer.h"
 
+#include "ddosi/bitbang-spi.h"
+#include "ddosi/ddosi-constants.h"
 
 #define SERVER_PORT	27015
 // #define MAX_PENDING	5
@@ -33,25 +36,6 @@
 #define MAX_PENDING     1
 #define MAX_LINE	512
 
-
-typedef struct Control
-{
-	int nSweep;
-	double dSweep;
-	double minF;
-	double maxF;
-	int nStep;
-	int nSample;
-	char *C_sweep;
-	char *C_step;
-	char *C_sample;
-	char *C_delay;
-	char *C_min;
-	char *C_max;	
-}Control; 	
-
-
-extern int startCollecting(int servSocket);
 extern int gotRandDebug(int servSocket);
 extern int fileCollecting(int servSocket);
 extern	double d_getPCVal(char*);
@@ -65,7 +49,7 @@ extern int saveToFile(char *fileName, Control settings);
 extern int readFromAddress(int new_s, char addrloc, int *iVal, double *dVal, int *type, Control& settings);
 extern int gotRandDebug(int new_s);
 extern int fileCollecting(int new_s);
-extern int startCollecting(int new_s);
+extern int startCollecting(int new_s, Control& settings, dds_bbspi_dev *dds_dev);
 //////////////////////////////////////////////////////////////////////////////////
 
 //#define rdtsc(x)      __asm__ __volatile__("rdtsc \n\t" : "=A" (*(x)))
@@ -80,7 +64,7 @@ int S_Handler(int new_s, char *buf){
 	if(pid == 0){
 		std::cout << "startCollecting" << std::endl;
 //		rdtsc(&start);	
-		startCollecting(new_s);
+		startCollecting(new_s, settings, &dds_device);
 //		rdtsc(&finish);
 //		double rtime = ((double)(finish-start))/(double)250000000; 
 //		std::cout << "scan performance:" << rtime << std::endl;
@@ -202,7 +186,8 @@ std::cout << "Starting persistent connection" << std::endl;
 				std::cout << "startCollecting" << std::endl;
 //				rdtsc(&start);	
 				printf("before collecting.\n");
-				startCollecting(new_s);
+
+				startCollecting(new_s, settings, &dds_device);
 				printf("after collecting.\n");
 //				rdtsc(&finish);
 //				double rtime = ((double)(finish-start))/(double)250000000; 					std::cout << "scan performance:" << rtime << std::endl;

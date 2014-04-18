@@ -15,7 +15,7 @@
 #include <time.h>
 #include <ctime>
 #include "collect.cpp"
-#include "top.h" // typedef struct Control
+#include "top.h" // typedef struct Control;
 //#include "getSettings.cpp"
 
 

@@ -20,6 +20,9 @@
 #include <fcntl.h>
 #include <stdint.h>
 
+#include "ddosi/bitbang-spi.h"
+#include "ddosi/ddosi-constants.h"
+
 //#define MAX_LINE 1024
 extern int MAX_LINE;
 
@@ -46,7 +49,7 @@ void *cdma; //cdma controller
 void *ram; //RAM address (Where the data is)
 inline void resetBoard();
 
-int startCollecting(int new_s)
+int startCollecting(int new_s, Control& settings, dds_bbspi_dev *dds_dev)
 {
 	char f = 'f';
 	char reply[MAX_LINE];
