@@ -265,8 +265,6 @@ void send_dds_configuration(dds_bbspi_dev *dds_device, unsigned int enabled_chan
 		dds_device->messages[i] = cfr3_settings;
 	}
 	dds_bbspi_write(dds_device);
-
-	dds_bbspi_delay(dds_device);
 	dds_bbspi_delay(dds_device);
 }
 

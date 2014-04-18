@@ -6,9 +6,11 @@
  * Boston Unversity ECE Department Senior Design
  * Boston University Electronics Design Facility.
  */
+#ifndef __DDOSI_CONSTANTS_H
+#define __DDOSI_CONSTANTS_H
+
 #define DDOSI_DSAU_REVA
 
-#define GPIO0_PORT_ADDR 0x81210000
 // Define Constants for DDS Controls, n represents channel.
 #define DDS_CS_OFFSET (3)
 #define DDS_CS_PIN(n) (DDS_CS_OFFSET + n)
@@ -45,3 +47,5 @@
 #define LED_STATUSR_PIN 19
 #define LED_STATUSG_PIN 20
 #define LED_STATUSB_PIN 21
+
+#endif

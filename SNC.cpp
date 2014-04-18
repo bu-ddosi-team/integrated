@@ -49,7 +49,7 @@ extern int saveToFile(char *fileName, Control settings);
 extern int readFromAddress(int new_s, char addrloc, int *iVal, double *dVal, int *type, Control& settings);
 extern int gotRandDebug(int new_s);
 extern int fileCollecting(int new_s);
-extern int startCollecting(int new_s, Control& settings, dds_bbspi_dev *dds_dev);
+extern int startCollecting(int new_s, Control& settings);
 //////////////////////////////////////////////////////////////////////////////////
 
 //#define rdtsc(x)      __asm__ __volatile__("rdtsc \n\t" : "=A" (*(x)))
@@ -58,13 +58,13 @@ unsigned long long start, finish;
 //DsauServer Dsau;
 Control param; 
 
-int S_Handler(int new_s, char *buf){
+int S_Handler(int new_s, char *buf) {
 	int status, len;			     
 	pid_t pid = fork();
 	if(pid == 0){
 		std::cout << "startCollecting" << std::endl;
 //		rdtsc(&start);	
-		startCollecting(new_s, settings, &dds_device);
+		startCollecting(new_s, param);
 //		rdtsc(&finish);
 //		double rtime = ((double)(finish-start))/(double)250000000; 
 //		std::cout << "scan performance:" << rtime << std::endl;
@@ -104,140 +104,125 @@ int main(int argc, char *argv[])
   int s, new_s;
   int c_one = 1;
   int rc;
+
+	
 //try{
   printf("Starting Server...\n");
-
+	
   //Initialize the addres data structure
   memset((void *)&sin, 0, sizeof(sin));
   sin.sin_family = AF_INET;
   sin.sin_addr.s_addr = INADDR_ANY;
   sin.sin_port = htons(SERVER_PORT);
-
+	
   //Create a socket
   if ((s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
     fprintf(stderr, "%s: socket - %s\n", argv[0], strerror(errno));
     exit(1);
   }
-
+	
   // set the "reuse" option 
   rc = setsockopt( s, SOL_SOCKET, SO_REUSEADDR, &c_one, sizeof(c_one));
-
+	
   //Bind an address to the socketh 
   if (bind(s, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
     fprintf(stderr, "%s: bind - %s\n", argv[0], strerror(errno));
     exit(1);
   }
-
+	
   
   //Set the length of the listen queue  
   if (listen(s, MAX_PENDING) < 0) {
     fprintf(stderr, "%s: listen - %s\n", argv[0], strerror(errno));
     exit(1);
   }
-
+	
   conn = 0;
-
+	
   //Loop accepting new connections and servicing them
   while (1) 
   {
     len = sizeof(sin);
     if ((new_s = accept(s, (struct sockaddr *)&sin, (socklen_t*)&len)) < 0) {
       fprintf(stderr, "%s: accept - %s\n",
-	      argv[0], strerror(errno));
+							argv[0], strerror(errno));
       exit(1);
     }
-
+		
     printf("New connection on fd:%d\n",new_s);
     ++conn;
     line = 0;
 /////////////////////////////////////////////////
 //////////////////////////////////////////////////
 //char f = 'f';
-int status;
+		int status;
 //srand(time(0));
-
-	char *sendbuf;// = "this is a test";
-	int fileSize;
-	char f = 'f';
-	char buf[MAX_LINE];
-	 char reply[MAX_LINE];
- 	 int conn, line;
- 	 int len;
- 	 int s;
-  	int strSize = MAX_LINE;
-
-//DsauServer param;
-std::cout << "Starting persistent connection" << std::endl;
-    	char *sendf= new char[MAX_LINE];
-	sprintf( sendf, "%c", f);
-	len = strlen( sendf);
-	while ( len = recv(new_s, buf, sizeof(buf), 0) && new_s > 0)
-	{
-	
-		for(int kk = 0; kk < len; kk++)
-		{
 		
-		}
+		char *sendbuf;// = "this is a test";
+		int fileSize;
+		char f = 'f';
+		char buf[MAX_LINE];
+		char reply[MAX_LINE];
+		int conn, line;
+		int len;
+		int s;
+		int strSize = MAX_LINE;
+		
+//DsauServer param;
+		std::cout << "Starting persistent connection" << std::endl;
+		char *sendf= new char[MAX_LINE];
+		sprintf( sendf, "%c", f);
+		len = strlen( sendf);
+		while ( len = recv(new_s, buf, sizeof(buf), 0) && new_s > 0)
+		{
+			for(int kk = 0; kk < len; kk++) { }
 //		std::cout << "Message received: \"" << buf<< "\"" << std::endl;
 //		len = recv(new_s, buf, sizeof(buf), 0);
-		fprintf(stderr, "Message received:%s \" ", buf);
-		if(buf[0] == 's'){ 
+			fprintf(stderr, "Message received:%s \" ", buf);
+			if (buf[0] == 's') { 
 //			S_Handler(new_s, buf);
 				std::cout << "startCollecting" << std::endl;
 //				rdtsc(&start);	
 				printf("before collecting.\n");
-
-				startCollecting(new_s, settings, &dds_device);
+				
+				startCollecting(new_s, param);
 				printf("after collecting.\n");
 //				rdtsc(&finish);
 //				double rtime = ((double)(finish-start))/(double)250000000; 					std::cout << "scan performance:" << rtime << std::endl;
-		}
-
-		else if(buf[0] == 'w'){ 
-
+			}	else if(buf[0] == 'w') { 
 				char addrloc = buf[1];
 				writeToAddr(new_s, addrloc, param, buf);
 				//saveToFile("Control_Settings.txt", param);
-		}
-		else if(buf[0] == 'r'){ 
-
+			}	else if(buf[0] == 'r') { 
 				char addrloc = buf[1];
 				int iVal, type;
 				double dVal;
 				readFromAddress(new_s, addrloc, &iVal, &dVal, &type, param);
-
-		}
-		else if(buf[0] == 't'){ 
-
+			}	else if(buf[0] == 't') { 
 				std::cout << "gotRandDebug" << std::endl;
 				gotRandDebug(new_s);
-
-		}
-		else if(buf[0] == 'f'){ 
+			}	else if(buf[0] == 'f') { 
 				std::cout << "fileCollecting" << std::endl;
 				fileCollecting(new_s);
-
-		}				
-		else{
-			std::cout << "no hits...What to do? \n";
-		}
-	std::cout << "______________________________________________________\n" << std::endl;	
-	std::cout << "waiting on client...\n" << std::endl;
-    	memset(buf, 0, MAX_LINE);
- 
+				
+			} else {
+				std::cout << "no hits...What to do? \n";
+			}
+			std::cout << "______________________________________________________\n" << std::endl;	
+			std::cout << "waiting on client...\n" << std::endl;
+			memset(buf, 0, MAX_LINE);
+			
 //	send( new_s, sendf, len, 0);
-
-	} //end while(len>0)
+			
+		} //end while(len>0)
     close(new_s);
   } //end while(1)p
-
+	
 //  }//end try
 //  catch(int e) {	std::cout << "int exception...\n" << std::endl;		}
 //  catch(char e){	std::cout << "char exception...\n" << std::endl;	}
 //  catch (const std::exception& e)  {    std::cout << e.what() << std::endl;  }
-//  catch(...){	std::cout << "default exception...\n" << std::endl;	}
-
-
+//  catch(...){	std::cout << "default exception...\n" << std::endl;	}	
 }
 
 

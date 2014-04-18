@@ -7,9 +7,13 @@
  * Boston University Electronics Design Facility.
  */
 //#define _POSIX_C_SOURCE 199309
+#ifndef __BITBANG_SPI_H
+#define __BITBANG_SPI_H
+
 #include "ddosi-constants.h"
 #include <stdint.h>
 #include <time.h>
+
 
 // Define flags for channel enabling
 #define DDS_NONE 0
@@ -92,3 +96,5 @@ uint32_t frequency2ftw(float f, float fs);
 void send_dds_configuration(dds_bbspi_dev *dds_device, unsigned int enabled_channels);
 void send_dds_profile(dds_bbspi_dev *dds_device, unsigned int enabled_channels);
 void load_profile_to_channel(dds_bbspi_dev *dds_device, uint32_t asf, uint64_t pow, float freq, unsigned int ch);
+
+#endif
